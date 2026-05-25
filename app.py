@@ -12,10 +12,7 @@ client = anthropic.Anthropic()
 
 MODEL = "claude-sonnet-4-6"
 MAX_TOKENS = 1024
-OPENING_MESSAGE = (
-    "Hi, I'm the J3P Leadership Advisory Assistant. "
-    "What leadership challenge are you working through?"
-)
+OPENING_MESSAGE = "Hello, welcome to your session with Alan Friedman's bot."
 
 INDEX_HTML = r"""<!DOCTYPE html>
 <html lang="en">
@@ -222,9 +219,18 @@ INDEX_HTML = r"""<!DOCTYPE html>
       font-size: 0.68rem;
       color: var(--muted);
       padding: 0 1rem 0.9rem;
-      letter-spacing: 0.18em;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
+      line-height: 1.7;
     }
+    .footer-note a {
+      color: var(--navy);
+      text-decoration: none;
+      border-bottom: 1px solid var(--gold);
+      padding-bottom: 1px;
+      transition: color 0.15s ease;
+    }
+    .footer-note a:hover { color: var(--rust); }
 
     @media (max-width: 640px) {
       .user { margin-left: 8%; }
@@ -239,7 +245,6 @@ INDEX_HTML = r"""<!DOCTYPE html>
 <body>
   <header>
     <div class="brand">
-      <img src="/static/monogram.jpg" alt="J3P Health" class="brand-logo" />
       <div class="brand-text">
         <span class="brand-name">J3P Health</span>
         <span class="brand-tag">Coach Alan Friedman</span>
@@ -256,10 +261,13 @@ INDEX_HTML = r"""<!DOCTYPE html>
 
   <div class="composer-wrap">
     <form id="chat-form">
-      <input type="text" id="message" placeholder="Describe your leadership challenge..." autocomplete="off" autofocus required />
+      <input type="text" id="message" placeholder="How can I help you?" autocomplete="off" autofocus required />
       <button type="submit" id="send-btn">Send</button>
     </form>
-    <div class="footer-note">J3P Health · Coach Alan Friedman</div>
+    <div class="footer-note">
+      For informational purposes only. Not medical, legal, or financial advice.<br />
+      To schedule time with Alan Friedman directly, please <a href="https://j3phealth.as.me/schedule/81cec0b7" target="_blank" rel="noopener">click here</a>.
+    </div>
   </div>
 
   <script>
