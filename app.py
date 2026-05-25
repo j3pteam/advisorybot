@@ -12,7 +12,7 @@ client = anthropic.Anthropic()
 
 MODEL = "claude-sonnet-4-6"
 MAX_TOKENS = 1024
-OPENING_MESSAGE = "Hello, welcome to your session with Alan Friedman's bot."
+OPENING_MESSAGE = "Hello, welcome to your session with the J3P Advisor."
 
 INDEX_HTML = r"""<!DOCTYPE html>
 <html lang="en">
@@ -70,29 +70,24 @@ INDEX_HTML = r"""<!DOCTYPE html>
     .brand {
       display: flex;
       align-items: center;
-      gap: 0.9rem;
+      gap: 1rem;
     }
     .brand-logo {
-      width: 42px;
-      height: 42px;
-      border-radius: 4px;
-      object-fit: contain;
-      background: var(--navy);
+      height: 64px;
+      width: auto;
+      display: block;
+      /* logo file is navy-bg with gold mark, blends into navy header */
     }
-    .brand-text { display: flex; flex-direction: column; line-height: 1.1; }
-    .brand-name {
-      font-family: 'Jost', sans-serif;
-      font-weight: 300;
-      font-size: 1.25rem;
-      letter-spacing: 0.04em;
-      color: var(--gold);
+    .brand-divider {
+      width: 1px;
+      height: 36px;
+      background: rgba(210, 188, 141, 0.35);
     }
     .brand-tag {
-      font-size: 0.68rem;
-      letter-spacing: 0.18em;
+      font-size: 0.78rem;
+      letter-spacing: 0.22em;
       text-transform: uppercase;
-      color: rgba(231, 206, 181, 0.7);
-      margin-top: 3px;
+      color: var(--gold);
       font-weight: 400;
     }
     header button {
@@ -236,8 +231,10 @@ INDEX_HTML = r"""<!DOCTYPE html>
       .user { margin-left: 8%; }
       .assistant { margin-right: 6%; }
       header { padding: 0.85rem 1rem; }
-      .brand-name { font-size: 1.1rem; }
-      .brand-logo { width: 36px; height: 36px; }
+      .brand-logo { height: 52px; }
+      .brand-tag { font-size: 0.66rem; letter-spacing: 0.14em; }
+      .brand { gap: 0.7rem; }
+      .brand-divider { height: 28px; }
       header button { padding: 0.4rem 0.7rem; font-size: 0.7rem; }
     }
   </style>
@@ -245,10 +242,9 @@ INDEX_HTML = r"""<!DOCTYPE html>
 <body>
   <header>
     <div class="brand">
-      <div class="brand-text">
-        <span class="brand-name">J3P Health</span>
-        <span class="brand-tag">Coach Alan Friedman</span>
-      </div>
+      <img src="/static/full_logo.jpg" alt="J3P Health" class="brand-logo" />
+      <span class="brand-divider"></span>
+      <span class="brand-tag">J3P Advisor</span>
     </div>
     <button id="reset-btn">New conversation</button>
   </header>
