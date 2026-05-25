@@ -73,18 +73,17 @@ INDEX_HTML = r"""<!DOCTYPE html>
       gap: 1rem;
     }
     .brand-logo {
-      height: 64px;
+      height: 52px;
       width: auto;
       display: block;
-      /* logo file is navy-bg with gold mark, blends into navy header */
     }
     .brand-divider {
       width: 1px;
-      height: 36px;
+      height: 32px;
       background: rgba(210, 188, 141, 0.35);
     }
     .brand-tag {
-      font-size: 0.78rem;
+      font-size: 0.95rem;
       letter-spacing: 0.22em;
       text-transform: uppercase;
       color: var(--gold);
@@ -231,10 +230,10 @@ INDEX_HTML = r"""<!DOCTYPE html>
       .user { margin-left: 8%; }
       .assistant { margin-right: 6%; }
       header { padding: 0.85rem 1rem; }
-      .brand-logo { height: 52px; }
-      .brand-tag { font-size: 0.66rem; letter-spacing: 0.14em; }
+      .brand-logo { height: 42px; }
+      .brand-tag { font-size: 0.78rem; letter-spacing: 0.16em; }
       .brand { gap: 0.7rem; }
-      .brand-divider { height: 28px; }
+      .brand-divider { height: 26px; }
       header button { padding: 0.4rem 0.7rem; font-size: 0.7rem; }
     }
   </style>
