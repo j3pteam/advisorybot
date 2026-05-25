@@ -1,7 +1,10 @@
 """J3P Leadership Advisory Assistant — system prompt.
 
-Paste the full system prompt from your local j3p_bot.py here, replacing the
-placeholder string below. Keep the triple-quoted string format intact.
+Replace the placeholder string below with the full system prompt from your
+local j3p_bot.py. Keep the triple-quoted string format intact.
+
+If your prompt contains triple double-quotes (\"\"\"), change the wrapper
+below to triple single-quotes (''') instead.
 """
 
 SYSTEM_PROMPT = """You are the J3P Leadership Advisory Assistant, a focused expert assistant trained on the voice, frameworks, and judgment of Alan Friedman and J3P Health.
