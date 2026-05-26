@@ -261,7 +261,7 @@ INDEX_HTML = r"""<!DOCTYPE html>
     </form>
     <div class="footer-note">
       For informational purposes only. Not medical, legal, or financial advice.<br />
-      To schedule time with Alan Friedman directly, please <a href="https://j3phealth.as.me/schedule/81cec0b7" target="_blank" rel="noopener">click here</a>.
+      To schedule time with a J3P Advisor, please <a href="https://j3phealth.as.me/schedule/81cec0b7" target="_blank" rel="noopener">click here</a>.
     </div>
   </div>
 
