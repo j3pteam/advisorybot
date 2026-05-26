@@ -172,7 +172,7 @@ INDEX_HTML = r"""<!DOCTYPE html>
     }
     input[type="text"] {
       flex: 1;
-      padding: 0.85rem 1.1rem;
+      padding: 0.85rem 3.2rem 0.85rem 1.1rem;
       border: 1px solid var(--line);
       border-radius: 2px;
       font-size: 0.95rem;
@@ -181,12 +181,49 @@ INDEX_HTML = r"""<!DOCTYPE html>
       background: var(--paper);
       color: var(--text);
       transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      width: 100%;
     }
     input[type="text"]:focus {
       border-color: var(--gold);
       box-shadow: 0 0 0 3px rgba(210, 188, 141, 0.18);
     }
     input[type="text"]::placeholder { color: rgba(39, 51, 74, 0.45); }
+    .input-wrap {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .mic-btn {
+      position: absolute;
+      right: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--navy);
+      color: var(--gold);
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      padding: 0;
+      transition: all 0.2s ease;
+    }
+    .mic-btn:hover { background: var(--gold); color: var(--navy); }
+    .mic-btn svg { width: 18px; height: 18px; }
+    .mic-btn.recording {
+      background: var(--rust);
+      color: #fff;
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+    .mic-btn.unsupported { display: none; }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(157, 67, 44, 0.6); }
+      50% { box-shadow: 0 0 0 8px rgba(157, 67, 44, 0); }
+    }
     button[type="submit"] {
       padding: 0.85rem 1.75rem;
       background: var(--navy);
@@ -256,7 +293,17 @@ INDEX_HTML = r"""<!DOCTYPE html>
 
   <div class="composer-wrap">
     <form id="chat-form">
-      <input type="text" id="message" placeholder="How can I help you?" autocomplete="off" autofocus required />
+      <div class="input-wrap">
+        <input type="text" id="message" placeholder="How can I help you?" autocomplete="off" autofocus required />
+        <button type="button" id="mic-btn" class="mic-btn" aria-label="Voice input" title="Click to speak">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+            <line x1="12" y1="19" x2="12" y2="23"/>
+            <line x1="8" y1="23" x2="16" y2="23"/>
+          </svg>
+        </button>
+      </div>
       <button type="submit" id="send-btn">Send</button>
     </form>
     <div class="footer-note">
@@ -325,6 +372,63 @@ INDEX_HTML = r"""<!DOCTYPE html>
       chat.appendChild(div);
       input.focus();
     });
+
+    // --- Voice input via Web Speech API ---
+    const micBtn = document.getElementById("mic-btn");
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      micBtn.classList.add("unsupported");
+    } else {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.lang = "en-US";
+
+      let isRecording = false;
+      let baseText = "";
+
+      micBtn.addEventListener("click", () => {
+        if (isRecording) {
+          recognition.stop();
+        } else {
+          baseText = input.value.trim();
+          if (baseText) baseText += " ";
+          try { recognition.start(); }
+          catch (err) { console.error("Speech recognition error:", err); }
+        }
+      });
+
+      recognition.addEventListener("start", () => {
+        isRecording = true;
+        micBtn.classList.add("recording");
+        micBtn.setAttribute("title", "Click to stop");
+      });
+
+      recognition.addEventListener("end", () => {
+        isRecording = false;
+        micBtn.classList.remove("recording");
+        micBtn.setAttribute("title", "Click to speak");
+        input.focus();
+      });
+
+      recognition.addEventListener("result", (event) => {
+        let transcript = "";
+        for (let i = 0; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript;
+        }
+        input.value = baseText + transcript;
+      });
+
+      recognition.addEventListener("error", (event) => {
+        console.error("Speech error:", event.error);
+        if (event.error === "not-allowed" || event.error === "service-not-allowed") {
+          alert("Microphone access is blocked. Please allow microphone access in your browser settings.");
+        }
+        isRecording = false;
+        micBtn.classList.remove("recording");
+      });
+    }
   </script>
 </body>
 </html>
