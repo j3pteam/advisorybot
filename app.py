@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """J3P Leadership Advisory Assistant — Flask web service for Railway."""
 import os
-from flask import Flask, request, jsonify, session, render_template_string
+from flask import Flask, request, jsonify, session, render_template_string, send_from_directory
 import anthropic
 from system_prompt import SYSTEM_PROMPT
 
@@ -20,7 +20,7 @@ INDEX_HTML = r"""<!DOCTYPE html>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>J3P Health — Coach Alan Friedman</title>
-  <link rel="icon" type="image/jpeg" href="/static/monogram.jpg" />
+  <link rel="icon" type="image/jpeg" href="/monogram.jpg" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -241,7 +241,7 @@ INDEX_HTML = r"""<!DOCTYPE html>
 <body>
   <header>
     <div class="brand">
-      <img src="/static/full_logo.png" alt="J3P Health" class="brand-logo" />
+      <img src="/full_logo.png" alt="J3P Health" class="brand-logo" />
       <span class="brand-divider"></span>
       <span class="brand-tag">J3P Advisor</span>
     </div>
@@ -384,6 +384,16 @@ def reset():
 @app.route("/health")
 def health():
     return jsonify({"status": "ok"})
+
+
+@app.route("/full_logo.png")
+def serve_logo():
+    return send_from_directory(".", "full_logo.png")
+
+
+@app.route("/monogram.jpg")
+def serve_monogram():
+    return send_from_directory(".", "monogram.jpg")
 
 
 if __name__ == "__main__":
