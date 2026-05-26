@@ -73,17 +73,17 @@ INDEX_HTML = r"""<!DOCTYPE html>
       gap: 1rem;
     }
     .brand-logo {
-      height: 52px;
+      height: 60px;
       width: auto;
       display: block;
     }
     .brand-divider {
       width: 1px;
-      height: 32px;
+      height: 38px;
       background: rgba(210, 188, 141, 0.35);
     }
     .brand-tag {
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       letter-spacing: 0.22em;
       text-transform: uppercase;
       color: var(--gold);
@@ -230,10 +230,10 @@ INDEX_HTML = r"""<!DOCTYPE html>
       .user { margin-left: 8%; }
       .assistant { margin-right: 6%; }
       header { padding: 0.85rem 1rem; }
-      .brand-logo { height: 42px; }
-      .brand-tag { font-size: 0.78rem; letter-spacing: 0.16em; }
+      .brand-logo { height: 48px; }
+      .brand-tag { font-size: 0.74rem; letter-spacing: 0.16em; }
       .brand { gap: 0.7rem; }
-      .brand-divider { height: 26px; }
+      .brand-divider { height: 30px; }
       header button { padding: 0.4rem 0.7rem; font-size: 0.7rem; }
     }
   </style>
@@ -241,7 +241,7 @@ INDEX_HTML = r"""<!DOCTYPE html>
 <body>
   <header>
     <div class="brand">
-      <img src="/static/full_logo.jpg" alt="J3P Health" class="brand-logo" />
+      <img src="/static/full_logo.png" alt="J3P Health" class="brand-logo" />
       <span class="brand-divider"></span>
       <span class="brand-tag">J3P Advisor</span>
     </div>
