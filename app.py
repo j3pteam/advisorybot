@@ -156,6 +156,59 @@ INDEX_HTML = r"""<!DOCTYPE html>
       background: var(--gold);
     }
     .typing { color: var(--muted); font-style: italic; }
+    .feedback {
+      display: flex;
+      gap: 0.4rem;
+      margin-top: 0.6rem;
+      padding-top: 0.6rem;
+      border-top: 1px solid var(--line);
+      align-items: center;
+    }
+    .feedback-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-right: 0.3rem;
+    }
+    .feedback-btn {
+      background: transparent;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      transition: all 0.18s ease;
+    }
+    .feedback-btn svg { width: 14px; height: 14px; }
+    .feedback-btn:hover {
+      border-color: var(--gold);
+      color: var(--navy);
+      background: var(--paper);
+    }
+    .feedback-btn.selected-up {
+      background: var(--navy);
+      border-color: var(--navy);
+      color: var(--gold);
+    }
+    .feedback-btn.selected-down {
+      background: var(--rust);
+      border-color: var(--rust);
+      color: #fff;
+    }
+    .feedback-btn:disabled { cursor: default; }
+    .feedback-thanks {
+      font-size: 0.7rem;
+      color: var(--muted);
+      margin-left: 0.4rem;
+      letter-spacing: 0.06em;
+      font-style: italic;
+    }
 
     /* Composer */
     .composer-wrap {
@@ -321,13 +374,57 @@ INDEX_HTML = r"""<!DOCTYPE html>
     const chatWrap = document.getElementById("chat-wrap");
     const OPENING = {{ opening|tojson }};
 
-    function addMessage(text, role) {
+    function addMessage(text, role, withFeedback = false) {
       const div = document.createElement("div");
       div.className = "msg " + role;
-      div.textContent = text;
+      const textNode = document.createElement("div");
+      textNode.textContent = text;
+      div.appendChild(textNode);
+      if (withFeedback) attachFeedback(div, text);
       chat.appendChild(div);
       chatWrap.scrollTop = chatWrap.scrollHeight;
       return div;
+    }
+
+    function attachFeedback(msgDiv, replyText) {
+      const wrap = document.createElement("div");
+      wrap.className = "feedback";
+      wrap.innerHTML = `
+        <span class="feedback-label">Helpful?</span>
+        <button class="feedback-btn" data-rating="up" aria-label="Thumbs up" title="Yes, helpful">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H7v-12L11.69 2.5a2 2 0 0 1 3.31 3.38z"/>
+          </svg>
+        </button>
+        <button class="feedback-btn" data-rating="down" aria-label="Thumbs down" title="No, not helpful">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 14V2"/><path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H17v12l-4.69 7.5a2 2 0 0 1-3.31-3.38z"/>
+          </svg>
+        </button>
+      `;
+      const buttons = wrap.querySelectorAll(".feedback-btn");
+      buttons.forEach(btn => {
+        btn.addEventListener("click", async () => {
+          if (btn.disabled) return;
+          const rating = btn.dataset.rating;
+          buttons.forEach(b => { b.disabled = true; });
+          btn.classList.add(rating === "up" ? "selected-up" : "selected-down");
+          const thanks = document.createElement("span");
+          thanks.className = "feedback-thanks";
+          thanks.textContent = "Thanks for the feedback";
+          wrap.appendChild(thanks);
+          try {
+            await fetch("/feedback", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ rating, reply: replyText }),
+            });
+          } catch (err) {
+            console.error("Feedback error:", err);
+          }
+        });
+      });
+      msgDiv.appendChild(wrap);
     }
 
     form.addEventListener("submit", async (e) => {
@@ -350,7 +447,7 @@ INDEX_HTML = r"""<!DOCTYPE html>
         const data = await res.json();
         thinking.remove();
         if (data.reply) {
-          addMessage(data.reply, "assistant");
+          addMessage(data.reply, "assistant", true);
         } else {
           addMessage("Error: " + (data.error || "Unknown error"), "assistant");
         }
@@ -482,6 +579,29 @@ def chat():
 @app.route("/reset", methods=["POST"])
 def reset():
     session["messages"] = []
+    return jsonify({"ok": True})
+
+
+@app.route("/feedback", methods=["POST"])
+def feedback():
+    data = request.get_json(silent=True) or {}
+    rating = data.get("rating")
+    reply = (data.get("reply") or "")[:500]  # truncate to keep logs reasonable
+    if rating not in ("up", "down"):
+        return jsonify({"error": "Invalid rating"}), 400
+
+    messages = session.get("messages", [])
+    last_user_msg = ""
+    for m in reversed(messages):
+        if m.get("role") == "user":
+            last_user_msg = (m.get("content") or "")[:500]
+            break
+
+    # Log to stdout — Railway captures these in the deploy logs (searchable)
+    app.logger.info(
+        "FEEDBACK rating=%s user_msg=%r reply=%r",
+        rating, last_user_msg, reply,
+    )
     return jsonify({"ok": True})
 
 
